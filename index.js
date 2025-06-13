@@ -3,6 +3,7 @@ require('dotenv').config();
 const fs = require('fs');
 const { Client, GatewayIntentBits } = require('discord.js');
 const { status } = require('minecraft-server-util');
+const { deploy } = require('./deploy-commands.js');
 
 const CONFIG_PATH = './servers.json';
 const servers = fs.existsSync(CONFIG_PATH)
@@ -13,9 +14,7 @@ const client = new Client({ intents: [ GatewayIntentBits.Guilds ] });
 
 client.once('ready', async () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
-  // deploy slash-commands on startup
-  await import('./deploy-commands.js').then(m => m.deploy(client));
-  // start monitoring any pre-configured servers
+  await deploy();
   for (const id of Object.keys(servers)) monitorServer(id);
 });
 
@@ -42,18 +41,21 @@ function monitorServer(id) {
     try {
       const s = await status(srv.ip, srv.port, { timeout: 5000 });
       if (srv.status !== 'online') notify(`🟢 **${srv.alias}** is online!`, srv);
-      const onlinePlayers = s.players.sample?.map(p => p.name) || [];
-      const joined = onlinePlayers.filter(p => !srv.players.includes(p));
-      const left   = srv.players.filter(p => !onlinePlayers.includes(p));
+
+      const online = s.players.sample?.map(p => p.name) || [];
+      const joined = online.filter(x => !srv.players.includes(x));
+      const left   = srv.players.filter(x => !online.includes(x));
+
       joined.forEach(p => notify(`🎉 **${p}** joined **${srv.alias}**`, srv));
       left.forEach(p => notify(`👋 **${p}** left **${srv.alias}**`, srv));
-      srv.players = onlinePlayers;
+
+      srv.players = online;
       srv.status  = 'online';
     } catch {
       if (srv.status !== 'offline') {
         notify(`🔴 **${srv.alias}** at \`${srv.ip}:${srv.port}\` has shut down!`, srv);
       }
-      srv.status = 'offline';
+      srv.status  = 'offline';
       srv.players = [];
     }
     fs.writeFileSync(CONFIG_PATH, JSON.stringify(servers, null, 2));
