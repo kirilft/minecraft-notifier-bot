@@ -27,10 +27,10 @@ client.on('interactionCreate', async interaction => {
   const { commandName } = interaction;
 
   if (commandName === 'initiate') {
-    const ip       = interaction.options.getString('ip');
-    const port     = interaction.options.getInteger('port');
-    const alias    = interaction.options.getString('alias') || `${ip}:${port}`;
-    const id       = `${ip}:${port}`;
+    const ip        = interaction.options.getString('ip');
+    const port      = interaction.options.getInteger('port');
+    const alias     = interaction.options.getString('alias') || `${ip}:${port}`;
+    const id        = `${ip}:${port}`;
     const channelId = interaction.channelId;
 
     if (servers[id]) {
@@ -51,6 +51,7 @@ client.on('interactionCreate', async interaction => {
     if (!id) {
       return interaction.reply(`❌ No monitored server found for \`${aliasInput}\`.`);
     }
+
     clearInterval(intervals[id]);
     delete intervals[id];
     const removed = servers[id];
