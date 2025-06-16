@@ -25,6 +25,7 @@ client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand()) return;
 
   const { commandName } = interaction;
+
   if (commandName === 'initiate') {
     const ip       = interaction.options.getString('ip');
     const port     = interaction.options.getInteger('port');
@@ -57,6 +58,17 @@ client.on('interactionCreate', async interaction => {
     fs.writeFileSync(CONFIG_PATH, JSON.stringify(servers, null, 2));
     return interaction.reply(`🗑️ Stopped monitoring **${removed.alias}**.`);
   }
+
+  if (commandName === 'list') {
+    const entries = Object.values(servers);
+    if (entries.length === 0) {
+      return interaction.reply('ℹ️ No servers are being monitored.');
+    }
+    const lines = entries.map(srv =>
+      `**${srv.alias}** - \`${srv.ip}:${srv.port}\` (status: ${srv.status}, players: ${srv.players.length})`
+    );
+    return interaction.reply(lines.join('\n'));
+  }
 });
 
 function monitorServer(id) {
@@ -83,7 +95,7 @@ function monitorServer(id) {
       srv.players = [];
     }
     fs.writeFileSync(CONFIG_PATH, JSON.stringify(servers, null, 2));
-  }, 15_000);
+  }, 15000);
 }
 
 async function notify(message, srv) {

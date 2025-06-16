@@ -2,7 +2,7 @@
 require('dotenv').config();
 const { REST, Routes, SlashCommandBuilder, Client, GatewayIntentBits } = require('discord.js');
 
-// Define slash commands: initiate, remove
+// Define slash commands: initiate, remove, list
 const commands = [
   new SlashCommandBuilder()
     .setName('initiate')
@@ -17,6 +17,10 @@ const commands = [
     .addStringOption(o => o.setName('alias')
       .setDescription('Alias or IP:Port of the server to remove')
       .setRequired(true))
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName('list')
+    .setDescription('List all monitored Minecraft servers')
     .toJSON()
 ];
 
@@ -29,7 +33,7 @@ async function deploy() {
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
   console.log(`🚀 Registering commands for app ${appId}…`);
   await rest.put(Routes.applicationCommands(appId), { body: commands });
-  console.log('✅ Slash commands deployed: initiate, remove');
+  console.log('✅ Slash commands deployed: initiate, remove, list');
 }
 
 if (require.main === module) {
