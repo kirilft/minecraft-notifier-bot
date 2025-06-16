@@ -7,30 +7,32 @@ const commands = [
   new SlashCommandBuilder()
     .setName('initiate')
     .setDescription('Configure a Minecraft server to monitor')
-    .addStringOption(o => 
+    .addStringOption(o =>
       o.setName('ip')
        .setDescription('Server IP or hostname')
        .setRequired(true)
     )
-    .addIntegerOption(o => 
+    .addIntegerOption(o =>
       o.setName('port')
        .setDescription('Server port')
        .setRequired(true)
     )
-    .addStringOption(o => 
+    .addStringOption(o =>
       o.setName('alias')
        .setDescription('Friendly name (e.g. Survival)')
     )
     .toJSON(),
+
   new SlashCommandBuilder()
     .setName('remove')
     .setDescription('Stop monitoring a configured Minecraft server')
-    .addStringOption(o => 
+    .addStringOption(o =>
       o.setName('alias')
        .setDescription('Alias or IP:Port of the server to remove')
        .setRequired(true)
     )
     .toJSON(),
+
   new SlashCommandBuilder()
     .setName('list')
     .setDescription('List all monitored Minecraft servers')
